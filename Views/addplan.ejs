@@ -1,0 +1,84 @@
+<%-include('header.ejs')%>
+<style>
+    #plan-warn{
+        display: none;
+    }
+</style>
+<div class="row p-5 justify-content-center align-items-center">
+<div class="col-lg-6 rounded-4 p-4 bg-secondary shadow">
+    <h2 class="text-center">Add Membership Plan</h2>
+    <div class="row">
+        <form method="post" action="/save-plan">
+        <div class="col-12 mb-3">
+            <label for="" class="mb-2">Plan Name:</label>
+            <span style="font-size: 14px;" id="plan-warn" class="text-danger" >
+                <br><i class="fa fa-warning"></i>&nbsp;&nbsp;This plan already exists</span>
+
+            <input type="text" onkeyup="checkDup(this)" required class="form-control bg-white" name="plan_name"/>
+        </div>
+        <div class="col-12 mb-3">
+           
+            <label for="" class="mb-2">Plan Days</label>
+            <input name="plan_days" class="form-control" required type="number"/>
+           
+        </div>
+        <div class="col-12 mb-3">
+            <label for="" class="mb-2">Plan Fees (&#8377;)</label>
+            <input type="number" required class="form-control bg-white" name="plan_fees"/>
+        </div>
+        <div class="col-12 mt-3 text-center">
+            <button class="btn btn-danger  w-25" type="submit">Save</button>
+        </form>
+        </div>
+    </div>
+
+
+</div>
+</div>
+<div class="row p-5">
+    <div class="col-lg-12 bg-secondary rounded-4 p-5">
+        <div class="w-100">
+            <h3 class="text-center">Plan List</h3>
+        </div>
+        <table class="table table-white table-striped table-bordered">
+            <tr>
+                <th>Sr no</th>
+                <th>Plan Name</th>
+                <th>Plan days</th>
+                <th>Plan Fees (in &#8377;)</th>
+                <th>Modified Date</th>
+                <th></th>
+            </tr>
+            <%for(let i=0;i<plan.length;i++){%>
+<tr>
+    <td><%-i+1%></td>
+    <td><%-plan[i].plan_name%></td>
+    <td><%-plan[i].plan_days%></td>
+    
+    <td><form action="/update-plan/<%-plan[i]._id%>" method="post">
+        <input type="number"  name="plan_fees" required value="<%-plan[i].plan_fees%>" class="form-control"/>
+      </td>
+    <td><%-plan[i].modified_date.toString().slice(4,15)%></td>
+    <td><button class="btn btn-primary btn-sm" type="submit"><i class="fa fa-upload"></i></button>
+    </form></td>
+</tr>
+                <%}%>
+        </table>
+    </div>
+</div>
+<script>
+    let ar=[];
+    <%for(let i of plan){%>
+        ar.push('<%-i.plan_name%>');
+ 
+    <%}%>
+    function checkDup(ele){
+        if(ar.includes(ele.value)){
+            document.getElementById('plan-warn').style.display='block';
+        }
+        else{
+            document.getElementById('plan-warn').style.display='none';   
+        }
+    }
+</script>
+<%-include('footer.ejs')%>

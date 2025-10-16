@@ -1,0 +1,83 @@
+<%-include('header.ejs')%>
+<style>
+    #mobile-warning{
+        display: none;
+    }
+</style>
+<div class="row justify-content-center align-items-center">
+    <div class="col-sm-12 col-xl-6 pt-5">
+        <div class="bg-secondary rounded h-100 p-4">
+            <h3 class="mb-4 text-center">Add new member</h3>
+            <form method="post" action="/save-member" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" required id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                   
+                </div>
+                 <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Photo</label>
+                    <input type="file" accept="image/*" name="pfp" class="form-control"  id="exampleInputEmail1"
+                        aria-describedby="emailHelp">
+                   
+                </div>
+                <div class="mb-3">
+                    <span id="mobile-warning" style="font-size: 14px;" class="text-danger"><i class="fa fa-warning"></i>&nbsp;&nbsp;This number already in use.  <br/> </span>
+                  <label for="exampleInputPassword1" class="form-label">Mobile Number</label>
+                    <input minlength="10" maxlength="12" type="number" onkeyup="checkMobile(this)" class="form-control" required name="mobile" id="exampleInputPassword1">
+                </div>
+                <div class="mb-3">
+                    <label  class="form-label">Membership </label>
+                    <select class="form-select " required name="membership" onchange="setPrice(this)" aria-label="Default select example">
+                        <option selected disabled value="">Select membership</option>
+                       <%for(let i=0;i<plans.length;i++){%>
+                        <option value="<%-plans[i]._id%>"><%-plans[i].plan_name%>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="float-end"><%-plans[i].plan_fees%> &#8377;</span> </option>
+                        
+                        <%}%>
+                        
+                       
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Paid fees</label>
+                    <input type="text" name="paid_fees" class="form-control" required id="exampleInputEmail1"
+                        aria-describedby="emailHelp" value="0" min="0">
+                   
+                </div>
+                <div class="mb-3">
+                    <label  class="form-label">Payment status</label>
+                    <select class="form-select " required name="payment_status"  aria-label="Default select example">
+                        <option selected disabled value="">Select Payment status</option>
+                      <option>Paid</option>
+                      <option>Pending</option>
+                        
+                       
+                    </select>
+                </div>
+                <button type="submit" id="submit-btn" disabled class="btn btn-primary w-100 rounded-0 mt-5">Add Member</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    let ar=[];
+    <%for(let i=0;i<mobiles.length;i++){%>
+        ar.push(<%-mobiles[i]%>)
+        
+        <%}%>
+ 
+   function checkMobile(ele){
+    
+    if(ar.includes(Number(ele.value))){
+       document.getElementById('submit-btn').disabled=true;
+       document.getElementById('mobile-warning').style.display='block';
+    }
+    else{
+        document.getElementById('submit-btn').disabled=false;
+        document.getElementById('mobile-warning').style.display='none';
+
+    }
+   }
+   
+</script>
+<%-include('footer.ejs')%>

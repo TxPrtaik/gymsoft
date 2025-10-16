@@ -1,0 +1,133 @@
+<%-include('header.ejs')%>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.6/css/dataTables.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<div class="container">
+    <div class="row justify-content-center mt-5 align-items-center" >
+        <div class="col-md-5 p-4 bg-secondary rounded shadow">
+            <div class="w-100 text-center mb-3"><h2>Member Details</h2></div>
+            <label class="mb-2">Name :</label>
+            <form method="post" action="/save-enq-mem">
+
+            <input type="text" name="name" class="form-control mb-3" required/>
+            <label class="mb-2">Number :</label>
+            <input type="number" name="mobile" class="form-control mb-3" required/>
+           
+            <div class="text-center">
+                <button class="btn btn-primary mt-3">Save</button>
+            </form>
+
+            </div>
+        </div>
+        <div class="row p-5"style="overflow-x: scroll;" >
+            <div class="col-md-12">
+                <table id="example" class="display nowrap"  style="width:100%;overflow-x: scroll;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Srno</th>
+                            <th>Name</th>
+                            
+                            <th>Mobile Number</th>
+                           
+                            <th>Date</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%for(let i=0;i<mems.length;i++){
+                            %>
+                            <tr>
+            
+                                <td>
+                                    
+                                    <!-- Button trigger modal -->
+<button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#exampleModal<%-mems[i]._id%>">
+    Start
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal<%-mems[i]._id%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Membership Details</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="post" action="/start-enq-mem/<%-mems[i]._id%>">
+        <div class="modal-body">
+           
+
+           
+          <label class="mb-2">Membership :</label>
+          <select class=" form-control mb-3" required name="membership" aria-label="Default select example">
+            <option selected disabled value="">Select membership</option>
+           <%for(let j of plans){%>
+            <option value="<%-j._id%>"><%-j.plan_name%>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="float-end"><%-j.plan_fees%> &#8377;</span> </option>
+            
+            <%}%>
+            
+           
+        </select>
+        <label for="" class="mb-2">Start Date :</label>
+        <input type="date" name="start_date" required class="form-control mb-3 bg-white"/>
+        <label for="" class="mb-2">Paid Fees :</label>
+<input class="mb-3 form-control bg-white" required name="paid_fees"/>
+<label for="" class="mb-2">Payment Status :</label>
+<select class="form-control mb-3" required name="payment_status" >
+    <option disabled value="" selected >Select Payment Status</option>
+    <option >Pending</option>
+    <option>Paid</option>
+</select>
+    </div>
+        <div class="modal-footer">
+         
+          <button  class="btn btn-primary">Start Membership</button>
+        
+        </div>
+    </form>
+      </div>
+    </div>
+  </div>
+                                </td>
+                                <td><%-i+1%></td>
+                                <td><%-mems[i].name%></td>
+                                <td><%-mems[i].mobile%></td>
+                                <td><%-mems[i].date%></td>
+                            </tr>
+                            
+                            
+                            
+                            <%
+                        }%>
+                    </tbody>
+                    <tfoot>
+                
+                      
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.datatables.net/2.0.6/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.jss"></script>
+
+<script type="text/javascript">
+	new DataTable('#example', {
+    layout: {
+        topStart: {
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        }
+    }
+});
+console.log(new Date('2024-12-10').toISOString().slice(0,10)<new Date().toISOString().slice(0,10));
+</script>
+<%-include('footer.ejs')%>

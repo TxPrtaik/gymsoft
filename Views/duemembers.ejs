@@ -1,0 +1,201 @@
+<%-include('header.ejs')%>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.6/css/dataTables.dataTables.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/3.0.2/css/buttons.dataTables.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<div class="row">
+    <div class="col-lg-12 p-5" style="overflow-x: scroll;">
+        <div class="w-100 text-center mb-5">
+            <h2>Due Memberships</h2>
+        </div>
+        <table id="example" class="display nowrap" style="width:100%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Srno</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Mobile Number</th>
+                    <th>Membership Plan</th>
+                    <th>Membership Started</th>
+                    <th>Membership Ending</th>
+                    <th>Joined On</th>
+                    <th>Plan Fees</th>
+                    <th >Paid fees till now</th>
+                    <th>Remaining</th>
+                    <th>Payment</th>
+                    <th></th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                <%for(let i=0;i<members.length;i++){%>
+        
+                
+                <tr>
+                    <td><a title="send message" target="_blank"  href="https://wa.me/<%-members[i].mobile%>?text= Hi *<%-members[i].name%>*!%0A%0A We wanted to remind you that your membership of *D-Fitness Zone* is  expired. We’d love for you to continue enjoying all the benefits!%0AIf you have any questions or would like to renew, feel free to reach out.%0AThank you for being a valued member!%0A%0ABest,%0A*D-Fitness Zone*" class="btn btn-success btn-xs"><i class="fa fa-whatsapp"></i></a>
+                        <button type="button" class="btn btn-info btn-xs" title="renew membership" data-bs-toggle="modal" data-bs-target="#exampleModal<%-i+1%>">
+                            <i class="fa-solid fa-rotate"></i>
+                          </button>
+                    </td>
+                    <td><%-i+1%></td>
+                    <td>
+            <button type="button" id="img-<%-members[i]._id%>" style="visibility: hidden;width: 5px;margin: 0px;height: 2px;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#imgModal-<%-members[i]._id%>">
+  Launch demo modal
+</button>
+            <img src="./img/<%-members[i].image%>" style="cursor: pointer;height: 50px;width: 50px;border-radius: 50%;" onclick="openImg('<%-members[i]._id%>')"/>
+<div class="modal fade" id="imgModal-<%-members[i]._id%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 text-dark" id="exampleModalLabel"><%-members[i].name%> </h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-center align-item-center">
+<img src="./img/<%-members[i].image%>" style="width: 300px;height:300px ;"/>
+
+        </div>
+        <div class="row mt-3">
+ <form action="/update-image/<%-members[i]._id%>" method="post" enctype="multipart/form-data">
+        <div class="input-group ">
+          <input type="file" accept="image/*" name="img" required/>
+<button class="btn btn-primary">Update</button>
+        </div>
+        
+        </form>
+        </div>
+       
+
+        
+      </div>
+      <div class="modal-footer">
+    
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+          </td>
+                    <td><%-members[i].name%></td>
+
+                    <td><%-members[i].mobile%></td>
+                    <td><%-members[i].plan_name%> days</td>
+                    <td><%-members[i].membership_started.toString().slice(4,15)%></td>
+                    <td><%-members[i].membership_ending.toString().slice(4,15)%></td>
+                    <td><%-members[i].join_date.toString().slice(4,15)%></td>
+                    <td><%-members[i].plan_fees%> &#8377;</td>
+                    <td  colspan="1" class="text-info">
+                        <%-members[i].paid_fees%>&#8377;
+                        <!----></td> 
+                    <td class="<%-(members[i].plan_fees-members[i].paid_fees==0)?'text-success':'text-danger'%>"><%-members[i].plan_fees-members[i].paid_fees%>&nbsp; &#8377;</td>
+                    <td class="<%-(members[i].payment_status=="Pending")?'text-warning':'text-success'%>"><%if(members[i].payment_status=='Pending'){%>
+                        Pending &nbsp;<a target="_blank" href="https://wa.me/<%-members[i].mobile%>?text=*<%-members[i].name%>*,%0A%0Aआपल्या जिम सदस्यत्वाशी संबंधित <%-members[i].plan_fees-members[i].paid_fees%> रुपये रक्कम थकबाकी आहे, याची ही एक अनुकूल आठवण आहे. आमच्या सुविधांचा आणि सेवांचा निर्बाध प्रवेश सुनिश्चित करण्यासाठी, कृपया लवकरात लवकर थकबाकीची रक्कम अदा करा.%0Aआमच्या जिमचे मूल्यवान सदस्य असल्याबद्दल धन्यवाद%0A%0Aआपल्या शुभेच्छांसह,%0A*D-fitness zone*" class="btn btn-sm btn-success rounded-circle"><i class="fa fa-whatsapp"></i></a>
+                        
+                        <%}else{%>
+                          Paid
+                          <%}%>
+                        </td>
+                 <td>
+               
+                    <a href="/delete-member/<%-members[i]._id%>" class="text-danger m-1"><i class="fa fa-trash"></i></a></td>
+
+                 </td>
+              </tr>
+              <div class="modal fade" id="exampleModal<%-i+1%>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h3 class="modal-title fs-5 text-dark" id="exampleModalLabel">Update membership of <span class="text-danger"><%-members[i].name%></span></h3>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="/renew-membership/<%-members[i]._id%>">
+        
+                        <div class="mb-3">
+                            <label class="mb-2">Start Date </label>
+                            <input type="date" name="date" required class="form-control mb-3 bg-white">
+                            <label  class="form-label">Renew Membership </label>
+                            <select class="form-control border-0 border-secondary " required name="membership" onchange="setPrice(this)" aria-label="Default select example">
+                                <option selected disabled value="">Select membership</option>
+                               <%for(let i=0;i<plans.length;i++){%>
+                                <option value="<%-plans[i]._id%>"><%-plans[i].plan_name%>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="float-end"><%-plans[i].plan_fees%> &#8377;</span> </option>
+                                
+                                <%}%>
+                                
+                               
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label  class="form-label">Paid fees</label>
+                            <input type="number" name="paid_fees" class="form-control bg-white " required 
+                                 value="0" min="0">
+                           
+                        </div>
+                        <div class="mb-3 ">
+                           
+                            <label  class="form-label">Payment status</label>
+                            <select class="form-control border-0 " required name="payment_status"  aria-label="Default select example">
+                                <option selected disabled value="">Select Payment status</option>
+                              <option>Paid</option>
+                              <option>Pending</option>
+                                
+                               
+                            </select>
+                        </div>
+                        <button class="btn btn-danger w-100" type="submit">Renew</button>
+                    </form>
+        
+
+    <hr>
+                    <form action="/update_paid_fees/<%-members[i]._id%>" class="mt-5" method="post">
+                        <label class="mb-2">Fees Paid :</label><br/>
+                        <div class="input-group">
+                      
+                        <input type="number"  class="form-control bg-white border border-light" name="paid">
+                      <button class="btn btn-success btn-xs" type="submit"><i class="fa fa-upload"></i></button>
+                      </div>
+                    </form>
+                   
+                     
+                
+                   
+                  </div>
+                </div>
+              </div>
+
+             
+             <%}%>
+            </tbody>
+            <tfoot>
+        
+              
+            </tfoot>
+        </table>
+        </div>
+</div>
+<script>
+    function openImg(id){
+    document.getElementById("img-"+id).click()
+
+  }
+</script>
+<script src="https://cdn.datatables.net/2.0.6/js/dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.dataTables.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.print.min.jss"></script>
+
+<script type="text/javascript">
+	new DataTable('#example', {
+    layout: {
+        topStart: {
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        }
+    }
+});
+
+</script>
+<%-include('footer.ejs')%>
