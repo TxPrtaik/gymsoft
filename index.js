@@ -7,6 +7,9 @@ let upload=require('express-fileupload');
 app.use(upload())
 let admin=require('./Route/Admin');
 app.use(express.static("public/"))
+let jwt=require("jsonwebtoken")
+let cookieparser=require("cookie-parser")
+app.use(cookieparser())
 app.use("/",admin);
 
 app.listen(1000);

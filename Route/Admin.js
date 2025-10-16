@@ -5,14 +5,51 @@ let Mem=require('../Model/Member');
 let not=require('../Model/Note');
 let delMem=require('../Model/DeleteMem');
 let EnqMem=require("../Model/EnqMem")
+let Login=require("../Model/Login")
+let jwt=require("jsonwebtoken")
+let cookieparser=require("cookie-parser")
+function authenticateAdmin(req,res,next){
+  
+let token=req.cookies.token;
+
+if(!token) return res.redirect("/login")
+jwt.verify(token,"pratik@123",(err,user)=>{
+   if(err){
+   res.status(400).json({"err":"user is not valid"})
+   }
+  req.user=user
+  next()
+})
+}
 
 route.get("/login",(req,res)=>{
    res.render("login.ejs")
 })
 
 
+route.post("/login",async(req,res)=>{
+let data=await Login.findOne({"username":req.body.username,"password":req.body.password})
+if(data){
+let token=jwt.sign({"id":data._id},"pratik@123",{expiresIn:"2h"})
+res.cookie("token",token)
+res.redirect("/")
+}
+else{
+   res.redirect("/login?warn=wrong_credentials")
+}
 
-route.get("/",(req,res)=>{
+//await Login(req.body).save()
+
+})
+
+
+
+
+
+
+
+
+route.get("/",authenticateAdmin,async(req,res)=>{
 res.redirect('/members')
 })
 let  checkActive =async()=>{
@@ -27,7 +64,7 @@ let  checkActive =async()=>{
    }
    
 }
-route.get('/add-member',async(req,res)=>{
+route.get('/add-member',authenticateAdmin,async(req,res)=>{
      let d=await Plan.find();
      let members=await Mem.find();
      let memberMobile=[];
@@ -40,7 +77,7 @@ route.get('/add-member',async(req,res)=>{
      }
    res.render('addmember.ejs',obj); 
 })
-route.get('/members',async(req,res)=>{
+route.get('/members',authenticateAdmin,async(req,res)=>{
    let d=await Mem.find({membership_status:'active'});
     checkActive();
     let obj={
@@ -51,7 +88,7 @@ route.get('/members',async(req,res)=>{
    
  res.render('memberstable.ejs',obj);
 })
-route.get('/add-plan',async(req,res)=>{
+route.get('/add-plan',authenticateAdmin,async(req,res)=>{
    let d=await Plan.find();
    let obj={
       "plan":d
@@ -168,20 +205,8 @@ req.body.plan_fees=plan.plan_fees;
       res.redirect('/members');
    }
    })
-   route.get("/lorem",async(req,res)=>{
-   let d=await Plan.findOne({plan_name:'1 month'})   
-   res.send(d);
-   
-   })
-   route.get('/something',async(req,res)=>{
-      let date=new Date();
-      date.setDate(date.getDate());
-    let d =await Mem.findById('6747351a08ee7ee7ff82d33d').updateOne({name:'Aditya chindhe',membership_ending:date.toString().slice(4,15)});
-   if(d.length!=0){
-      res.send(new Date().toString().slice(4,15));
-   }
-   })
-   route.get('/due-members',async(req,res)=>{
+  
+   route.get('/due-members',authenticateAdmin,async(req,res)=>{
      let d=await Mem.find();
    
      for( let i of d){
@@ -208,7 +233,7 @@ req.body.plan_fees=plan.plan_fees;
    res.render('duemembers.ejs',obj);
    })
 
-   route.get("/delete-member/:id",async(req,res)=>{
+   route.get("/delete-member/:id",authenticateAdmin,async(req,res)=>{
       
 let  member=await Mem.findById(req.params.id);
 let del_mem={
@@ -223,7 +248,7 @@ let del_mem={
 let a=await delMem(del_mem).save();
     let d=await Mem.findById(member._id).deleteOne();
 
-console.log(member);
+
 
 
          res.redirect('/members');
@@ -248,7 +273,7 @@ console.log(member);
          }
          }
    })
-   route.get("/enquiry",async(req,res)=>{
+   route.get("/enquiry",authenticateAdmin,async(req,res)=>{
      let pl=await Plan.find();
      let mems=await EnqMem.find();
      let obj={
@@ -263,7 +288,7 @@ console.log(member);
 
       res.redirect("/enquiry");
    })
-   route.get("/delete-note/:id",async(req,res)=>{
+   route.get("/delete-note/:id",authenticateAdmin,async(req,res)=>{
       let d=await not.findById(req.params.id).deleteOne();
       res.redirect('/notes');
    })
@@ -305,5 +330,13 @@ route.post("/update-image/:id",async(req,res)=>{
    req.files.img.mv("./public/img/"+req.body.image)
 await Mem.findById(req.params.id).updateOne({"image":req.body.image})
    res.redirect("/members")
+})
+route.get("/logout",authenticateAdmin,async(req,res)=>{
+res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+  });
+  res.redirect("/")
 })
 module.exports=route;
