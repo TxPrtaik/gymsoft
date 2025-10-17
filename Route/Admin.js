@@ -339,4 +339,8 @@ res.clearCookie("token", {
   });
   res.redirect("/")
 })
+route.get("/permanant-del/:id",authenticateAdmin,async(req,res)=>{
+  await delMem.findById(req.params.id).deleteOne();
+  res.redirect("/deleted-mems")
+})
 module.exports=route;
