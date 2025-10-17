@@ -10,6 +10,7 @@ app.use(express.static("public/"))
 let jwt=require("jsonwebtoken")
 let cookieparser=require("cookie-parser")
 app.use(cookieparser())
+app.set('views', path.join(__dirname, 'Views'));
 app.use("/",admin);
 
 app.listen(1000);
